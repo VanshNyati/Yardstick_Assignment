@@ -6,18 +6,15 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-let cached = global.mongoose;
+// Simple connection cache
+let isConnected = false;
 
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
-export const connectDB = async () => {
-  if (cached.conn) {
-    return cached.conn;
+export const connectDB = async (): Promise<void> => {
+  if (isConnected) {
+    return;
   }
 
-  if (!cached.promise) {
+  try {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
@@ -27,19 +24,11 @@ export const connectDB = async () => {
       retryWrites: true,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ MongoDB connected successfully');
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
+    await mongoose.connect(MONGODB_URI, opts);
+    isConnected = true;
+    console.log('✅ MongoDB connected successfully');
   } catch (e) {
-    cached.promise = null;
     console.error('❌ MongoDB connection error:', e);
     throw e;
   }
-
-  return cached.conn;
 };

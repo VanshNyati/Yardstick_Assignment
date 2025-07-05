@@ -25,7 +25,7 @@ const MonthlyBarChart: React.FC<MonthlyBarChartProps> = ({ transactions }) => {
     const monthlyMap = new Map<string, number>();
     
     // Get last 6 months
-    const months = [];
+    const months: MonthlyData[] = [];
     const currentDate = new Date();
     for (let i = 5; i >= 0; i--) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);

@@ -3,7 +3,7 @@ import { updateTransaction } from '@/actions/transactions';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
@@ -16,11 +16,13 @@ export async function PUT(
       );
     }
 
-    const result = await updateTransaction(params.id, {
+    const { id } = await context.params;
+
+    const result = await updateTransaction(id, {
       description,
       amount,
       date,
-      category
+      category,
     });
 
     if (result.success) {
@@ -38,4 +40,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-} 
+}

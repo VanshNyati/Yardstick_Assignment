@@ -47,7 +47,7 @@ export const getBudgets = async (): Promise<BudgetWithSpending[]> => {
     });
 
     // Combine budget and spending data
-    return budgets.map(budget => {
+    return budgets.map((budget: any) => {
       const spending = spendingByCategory.get(budget.category) || 0;
       const remaining = budget.amount - spending;
       const percentage = budget.amount > 0 ? (spending / budget.amount) * 100 : 0;

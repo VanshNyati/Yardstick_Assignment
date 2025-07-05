@@ -4,15 +4,25 @@ import { connectDB } from '@/lib/db';
 import { Transaction } from '@/models/transactionModel';
 import { revalidatePath } from 'next/cache';
 
+// Define the transaction type
+interface TransactionData {
+  _id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+}
+
 // ✅ Fetch all transactions
-export const getTransactions = async () => {
+export const getTransactions = async (): Promise<TransactionData[]> => {
   try {
     await connectDB();
     const transactions = await Transaction.find().sort({ date: -1 }).lean();
-    return transactions.map(txn => ({
+    return transactions.map((txn: any) => ({
       ...txn,
       _id: txn._id.toString(),
       date: txn.date instanceof Date ? txn.date.toISOString() : txn.date,
+      category: txn.category || 'Uncategorized'
     }));
   } catch (err) {
     console.error("❌ Error fetching transactions:", err);
@@ -89,6 +99,6 @@ export const deleteTransaction = async (id: string) => {
 };
 
 // ✅ Fetch all transactions (alias for getTransactions)
-export const getAllTransactions = async () => {
+export const getAllTransactions = async (): Promise<TransactionData[]> => {
   return await getTransactions();
 };
